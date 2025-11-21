@@ -1,0 +1,81 @@
+-- 🎯 SOLO los nombres que pediste
+local targets = {
+    "Chancla",
+    "Los bros combinasion",
+    "Westcol",
+    "Niño del Oxxo",
+    "SusFacheroRojo",
+    "Mitico",
+    "Mítico",
+    "Secreto",
+    "CapitanPerusini",
+    "ComoTamuchacho",
+    "El Chavo Boss",
+}
+
+-- Convertimos a minúsculas para acelerar
+for i, v in ipairs(targets) do
+    targets[i] = string.lower(v)
+end
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local localPlayer = Players.LocalPlayer
+
+-- Para evitar revisar miles de veces lo mismo
+local alreadyESP = {}
+
+-- Crear ESP con contorno
+local function createESP(part, text)
+    if not part or alreadyESP[part] then return end
+    alreadyESP[part] = true
+
+    local bgui = Instance.new("BillboardGui")
+    bgui.Name = "DZ_ESP"
+    bgui.AlwaysOnTop = true
+    bgui.Size = UDim2.new(0, 120, 0, 40)
+    bgui.StudsOffset = Vector3.new(0, 3, 0)
+    bgui.Adornee = part
+    bgui.Parent = part
+
+    local lbl = Instance.new("TextLabel")
+    lbl.Parent = bgui
+    lbl.Size = UDim2.new(1, 0, 1, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = text
+    lbl.TextScaled = true
+    lbl.Font = Enum.Font.GothamBlack
+    lbl.TextColor3 = Color3.fromRGB(255, 255, 0)
+
+    -- CONTORNO
+    lbl.TextStrokeTransparency = 0
+    lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+end
+
+-- Detecta si el nombre está en la lista
+local function isTarget(name)
+    name = string.lower(name)
+    for _, t in ipairs(targets) do
+        if string.find(name, t) then
+            return true
+        end
+    end
+    return false
+end
+
+-- 🔥 SUPER OPTIMIZADO
+-- En vez de correr 60 veces por segundo
+-- Solo revisa cada 0.7 segundos
+task.spawn(function()
+    while true do
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if (obj:IsA("Model") or obj:IsA("Part")) and isTarget(obj.Name) then
+                local mainPart = obj:FindFirstChildWhichIsA("BasePart")
+                if mainPart then
+                    createESP(mainPart, obj.Name)
+                end
+            end
+        end
+        task.wait(0.7) -- 🔥 Ultra bajo consumo
+    end
+end)
